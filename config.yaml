@@ -1,0 +1,133 @@
+# JMP2-Uber-Max Configuration
+# July 2026 — Netflix-grade HLS proxy aggregator
+
+server:
+  host: "0.0.0.0"
+  port: 9223
+  workers: 4
+  keepalive_timeout: 300
+  request_timeout: 30
+
+proxy:
+  upstream_timeout: 15
+  max_redirects: 3
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  strip_headers:
+    - "x-forwarded-for"
+    - "x-real-ip"
+  add_headers:
+    Accept: "*/*"
+    Accept-Encoding: "identity"
+    Connection: "keep-alive"
+
+scte35:
+  enabled: true
+  markers:
+    - "#EXT-X-CUE-OUT"
+    - "#EXT-X-CUE-IN"
+    - "#EXT-X-SCTE35"
+    - "#EXT-X-DATERANGE"
+    - "#EXT-X-ASSET-CTE"
+  ad_keywords:
+    - "advertisement"
+    - "commercial"
+    - "break"
+    - "sponsored"
+  min_ad_duration_sec: 5
+  max_ad_duration_sec: 300
+
+validation:
+  enabled: true
+  concurrency: 50
+  timeout_sec: 10
+  retry_count: 2
+  retry_delay_sec: 1
+  acceptable_status: [200, 301, 302, 307, 308]
+  acceptable_content_types:
+    - "application/vnd.apple.mpegurl"
+    - "application/x-mpegurl"
+    - "audio/mpegurl"
+    - "video/mp2t"
+    - "video/mp4"
+    - "audio/aac"
+    - "audio/mp3"
+    - "application/octet-stream"
+  health_check_interval_sec: 300
+
+english_filter:
+  enabled: true
+  require_english: true
+  language_keywords:
+    english:
+      - "uk"
+      - "us"
+      - "usa"
+      - "british"
+      - "american"
+      - "cnn"
+      - "bbc"
+      - "fox"
+      - "nbc"
+      - "abc"
+      - "cbs"
+      - "hbo"
+      - "showtime"
+      - "amc"
+      - "fx"
+      - "sky"
+      - "espn"
+      - "discovery"
+      - "nat geo"
+      - "history"
+    exclude:
+      - "espanol"
+      - "spanish"
+      - "latino"
+      - "francais"
+      - "deutsch"
+      - "russkiy"
+      - "chinese"
+      - "arabic"
+      - "hindi"
+      - "portugues"
+      - "italiano"
+      - "turkce"
+      - "polski"
+  preferred_domains:
+    - "jmp2.uk"
+    - "1tv41.icu"
+    - "p2premium.club"
+    - "flixtv.uk"
+    - "dplatino.net"
+    - "mundo2.pro"
+    - "mundo2.vip"
+    - "ceoapps.org"
+
+quality:
+  tiers:
+    fhd_1080:
+      keywords: ["1080p", "fhd", "full hd", "1920x1080"]
+      score: 100
+    hd_720:
+      keywords: ["720p", "hd", "high definition", "1280x720"]
+      score: 70
+    sd_480:
+      keywords: ["480p", "sd", "standard", "640x480"]
+      score: 40
+    low:
+      keywords: ["360p", "240p", "144p", "low"]
+      score: 10
+  default_score: 25
+
+cache:
+  manifest_ttl_sec: 30
+  segment_ttl_sec: 5
+  max_manifest_entries: 1000
+  max_segment_entries: 5000
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+  file: "logs/jmp2_uber.log"
+  max_bytes: 10485760
+  backup_count: 5
